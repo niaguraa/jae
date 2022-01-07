@@ -49,26 +49,19 @@ class Basics(commands.Cog):
 
         def is_mention(msg):
             if msg.mentions:
-                return False
+                if msg.author.bot:
+                    return True
+                else:
+                    return False
             else:
                 return True
 
-        # def is_command(msg):
-        #     if len(msg.content) == 0:
-        #         return False
-        #     elif msg.content.split()[0] == '_scan':
-        #         return True
-        #     else:
-        #         return False
-        
-        async for msg in ctx.channel.history(limit=msglimit):
-            if not is_mention(msg):
+        async for msg in ctx.channel.history(limit=None):
+            if not is_mention(msg) and "<@" in msg.content:
                 data = data.append({'content': msg.content,
-                                    'time': msg.created_at,
-                                    'author': msg.author.id}, ignore_index=True)
-                
-                if len(data) == msglimit:
-                    break
+                                        'time': msg.created_at,
+                                        'author': msg.author.id}, ignore_index=True)
+                print(data)
         
         file_location = "data.csv"
         data.to_csv(file_location)

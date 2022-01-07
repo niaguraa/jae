@@ -47,17 +47,22 @@ class Basics(commands.Cog):
         data = pd.DataFrame(columns=['content', 'time', 'author'])
         msglimit = 10000
 
-        def is_command(msg):
-            if len(msg.content) == 0:
+        def is_mention(msg):
+            if msg.mentions:
                 return False
-            elif msg.content.split()[0] == '_scan':
-                return True
             else:
-                return False
+                return True
+
+        # def is_command(msg):
+        #     if len(msg.content) == 0:
+        #         return False
+        #     elif msg.content.split()[0] == '_scan':
+        #         return True
+        #     else:
+        #         return False
         
         async for msg in ctx.channel.history(limit=msglimit):
-            # if msg.author != ctx.author:
-            if not is_command(msg):
+            if not is_mention(msg):
                 data = data.append({'content': msg.content,
                                     'time': msg.created_at,
                                     'author': msg.author.id}, ignore_index=True)

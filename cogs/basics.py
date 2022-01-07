@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import random
+import pandas as pd
 
 class Basics(commands.Cog):
 
@@ -40,6 +41,32 @@ class Basics(commands.Cog):
             "Very doubtful."
         ]
         await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
+
+    @commands.command()
+    async def scan(self, ctx):
+        data = pd.DataFrame(columns=['content', 'time', 'author'])
+        msglimit = 10000
+
+        def is_command(msg):
+            if len(msg.content) == 0:
+                return False
+            elif msg.content.split()[0] == '_scan':
+                return True
+            else:
+                return False
+        
+        async for msg in ctx.channel.history(limit=msglimit):
+            # if msg.author != ctx.author:
+            if not is_command(msg):
+                data = data.append({'content': msg.content,
+                                    'time': msg.created_at,
+                                    'author': msg.author.id}, ignore_index=True)
+                
+                if len(data) == msglimit:
+                    break
+        
+        file_location = "data.csv"
+        data.to_csv(file_location)
 
     @commands.command()
     async def whisper(self, ctx, user: discord.Member, *, message):

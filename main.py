@@ -3,7 +3,6 @@ from discord.channel import TextChannel
 from discord.ext import commands
 from dotenv import load_dotenv
 import random
-import pandas as pd
 
 import os
 
@@ -36,7 +35,6 @@ async def load(ctx, extension):
 async def unload(ctx, extension):
     bot.unload_extension(f'cogs.{extension}')
 
-@commands.command()
 async def scan(self, ctx):
     data = pd.DataFrame(columns=['content', 'time', 'author'])
 
@@ -56,7 +54,6 @@ async def scan(self, ctx):
                                     'author': msg.author.name}, ignore_index=True)
             
             if len(data) == limit:
-                break
     
     file_location = "data.csv"
     data.to_csv(file_location)

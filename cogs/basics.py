@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import pandas as pd
+from datetime import datetime
 
 class Basics(commands.Cog):
 
@@ -44,6 +45,7 @@ class Basics(commands.Cog):
 
     @commands.command()
     async def scan(self, ctx):
+        date = datetime.strptime('Oct 1 2021 12:00AM', '%b %d %Y %I:%M%p')
         data = pd.DataFrame(columns=['content', 'time', 'author'])
         msglimit = 10000
 
@@ -56,7 +58,7 @@ class Basics(commands.Cog):
             else:
                 return True
 
-        async for msg in ctx.channel.history(limit=None):
+        async for msg in ctx.channel.history(limit=None, after=date):
             if not is_mention(msg) and "<@" in msg.content:
                 data = data.append({'content': msg.content,
                                         'time': msg.created_at,

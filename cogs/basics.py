@@ -3,6 +3,8 @@ from discord.ext import commands
 import random
 import pandas as pd
 from datetime import datetime
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 class Basics(commands.Cog):
 
@@ -45,7 +47,7 @@ class Basics(commands.Cog):
 
     @commands.command()
     async def scan(self, ctx):
-        date = datetime.strptime('Oct 1 2021 12:00AM', '%b %d %Y %I:%M%p')
+        date1 = datetime.strptime(str(date.today() + relativedelta(months=-3)), '%Y-%m-%d') #timeframe
         data = pd.DataFrame(columns=['content', 'time', 'author'])
         msglimit = 10000
 
@@ -58,14 +60,18 @@ class Basics(commands.Cog):
             else:
                 return True
 
-        async for msg in ctx.channel.history(limit=None, after=date):
-            if not is_mention(msg) and "<@" in msg.content:
-                data = data.append({'content': msg.content,
-                                        'time': msg.created_at,
-                                        'author': msg.author.id}, ignore_index=True)
-                print(data)
+        async for msg in ctx.channel.history(limit=None, after=date1):
+            try:
+                if not is_mention(msg) and "<@" in msg.content:
+                    data = data.append({'content': msg.content,
+                                            'time': msg.created_at,
+                                            'author': msg.author.id}, ignore_index=True)
+                    print(data)
+            except:
+                pass
         
-        file_location = "data.csv"
+        id = ctx.message.guild.id
+        file_location = str(id)+ ".csv"
         data.to_csv(file_location)
 
     @commands.command()

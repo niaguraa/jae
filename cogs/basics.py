@@ -5,6 +5,10 @@ import pandas as pd
 from datetime import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from information import extract
+import networkx as nx
+import json
+import matplotlib.pyplot as plt
 
 class Basics(commands.Cog):
 
@@ -73,6 +77,31 @@ class Basics(commands.Cog):
         id = ctx.message.guild.id
         file_location = str(id)+ ".csv"
         data.to_csv(file_location)
+
+        extract(id)
+        print("Process Complete!")
+    
+    @commands.command()
+    async def testingimage(self, ctx):
+        f = open('trashpandasData.json')
+        data = json.load(f)
+        conn = nx.Graph()
+        for i in data:
+            for j in data[i][0]:
+                weight = data[i][0][j]
+                # print(weight)
+                # print(j)
+
+                conn.add_edge(i, j, weight=weight)
+
+        nx.draw_kamada_kawai(conn)
+        plt.savefig("temp.png", format="PNG")
+
+        with open("temp.png", 'rb') as g:
+            picture = discord.File(g)
+            await ctx.send(file=picture)
+
+        # await ctx.send(nx.draw_kamada_kawai(conn))
 
     @commands.command()
     async def whisper(self, ctx, user: discord.Member, *, message):

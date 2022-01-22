@@ -9,6 +9,7 @@ from information import extract
 import networkx as nx
 import json
 import matplotlib.pyplot as plt
+from main import prefix
 
 class Basics(commands.Cog):
 
@@ -21,7 +22,7 @@ class Basics(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send(f'pong {round(self.bot.latency * 1000)}ms')
+        await ctx.send(f'{ctx.author.mention} pong {round(self.bot.latency * 1000)}ms')
 
     @commands.command(aliases=['8ball'])
     async def _8ball(self, ctx, *, question):
@@ -79,10 +80,11 @@ class Basics(commands.Cog):
         data.to_csv(file_location)
 
         extract(id)
+        await ctx.send(f'{ctx.author.mention} Your request is complete! Please type `{prefix}visualize` to Visualize your data!')
         print("Process Complete!")
     
     @commands.command()
-    async def testingimage(self, ctx):
+    async def visualize(self, ctx):
         f = open('trashpandasData.json')
         data = json.load(f)
         conn = nx.Graph()
@@ -93,8 +95,10 @@ class Basics(commands.Cog):
                 # print(j)
 
                 conn.add_edge(i, j, weight=weight)
+                # Add centralities
+                # Return statistics
 
-        nx.draw_kamada_kawai(conn)
+        nx.draw_kamada_kawai(conn, with_labels=True)
         plt.savefig("temp.png", format="PNG")
 
         with open("temp.png", 'rb') as g:
@@ -102,7 +106,36 @@ class Basics(commands.Cog):
             await ctx.send(file=picture)
 
         # await ctx.send(nx.draw_kamada_kawai(conn))
+    
+    @commands.command()
+    async def stats(self, ctx):
+        f = open('trashpandasData.json')
+        data = json.load(f)
+        conn = nx.Graph()
+        for i in data:
+            for j in data[i][0]:
+                weight = data[i][0][j]
+                # print(weight)
+                # print(j)
 
+                conn.add_edge(i, j, weight=weight)
+                # Add centralities
+                # Return statistics
+
+        nx.draw_kamada_kawai(conn, with_labels=True)
+        plt.savefig("temp.png", format="PNG")
+
+        with open("temp.png", 'rb') as g:
+            picture = discord.File(g)
+            await ctx.send(file=picture)
+
+        betweenness = nx.betweenness_centrality(conn)
+        closeness = nx.closeness_centrality(conn)
+
+        await ctx.send('**__Top 3 Betweeness Centrality__**')
+        for i in list(betweenness.items())[:3]:
+            await ctx.send(f'<@{i[0]}>: {i[1]}')
+    
     @commands.command()
     async def whisper(self, ctx, user: discord.Member, *, message):
         responses = [

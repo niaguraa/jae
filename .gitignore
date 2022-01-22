@@ -1,3 +1,6 @@
 .env
 cogs/__pycache__/basics.cpython-36.pyc
 data.csv
+*.csv
+*.json
+*.pyc

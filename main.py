@@ -6,7 +6,7 @@ import random
 
 import os
 
-prefix = '..'
+prefix = 'jae'
 
 client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)

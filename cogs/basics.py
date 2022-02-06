@@ -24,6 +24,11 @@ class Basics(commands.Cog):
     async def ping(self, ctx):
         await ctx.send(f'{ctx.author.mention} pong {round(self.bot.latency * 1000)}ms')
 
+    # @commands.command()
+    # async def getuname(self, ctx):
+    #     test = "@" + str(ctx.author)
+    #     await ctx.send(f'{test} from {ctx.author}')
+
     @commands.command(aliases=['8ball'])
     async def _8ball(self, ctx, *, question):
         responses = [
@@ -53,7 +58,7 @@ class Basics(commands.Cog):
     @commands.command()
     async def scan(self, ctx):
         date1 = datetime.strptime(str(date.today() + relativedelta(months=-3)), '%Y-%m-%d') #timeframe
-        data = pd.DataFrame(columns=['content', 'time', 'author'])
+        data = pd.DataFrame(columns=['content', 'time', 'author', 'authorid'])
         msglimit = 10000
 
         def is_mention(msg):
@@ -68,10 +73,12 @@ class Basics(commands.Cog):
         async for msg in ctx.channel.history(limit=None, after=date1):
             try:
                 if not is_mention(msg) and "<@" in msg.content:
-                    data = data.append({'content': msg.content,
+                    data = data.append({'content': msg.raw_mentions,
                                             'time': msg.created_at,
-                                            'author': msg.author.id}, ignore_index=True)
+                                            'author': msg.author, 
+                                            'authorid': msg.author.id}, ignore_index=True)
                     print(data)
+                    # print(msg.raw_mentions)
             except:
                 pass
         
@@ -107,6 +114,16 @@ class Basics(commands.Cog):
 
         # await ctx.send(nx.draw_kamada_kawai(conn))
     
+    # For future bot usage
+    @commands.command()
+    async def testing(self, ctx):
+        embedVar = discord.Embed(title="Title", description="Desc", color=0x00ff00)
+        embedVar.add_field(name="Field1", value="hi", inline=False)
+        embedVar.add_field(name="Field2", value="hi2", inline=False)
+        embedVar.set_image(url='temp.png')
+        # test = discord.Embed()
+        await ctx.send(embed=embedVar)
+
     @commands.command()
     async def stats(self, ctx):
         f = open('trashpandasData.json')
